@@ -41,6 +41,8 @@ class Room: public Container{
     bool isExitHidden(const int whichDirection) const;
     virtual bool isExitAccessible(const int whichDirection) const;
     bool isThisRoom1OfExit(const int whichDirection) const;
+    virtual bool isCurrentRoom(Room* room) const;
+    virtual bool isAdjacentRoom(Room* room) const;
     bool isVisible() const;
     bool areThereNoExits() const;
     bool areAllExitsHidden() const;
@@ -61,9 +63,10 @@ class Room: public Container{
     }
 
     virtual void displayExits(std::ostream& o) const;
+    virtual void displayObjects(std::ostream& o) const;
     virtual void display(std::ostream& o) const;
 
-    virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+    virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL, const int extra=0);
 
     static unsigned int getNextRoomID(){return s_nextRoomID;}
     static unsigned int getRoomCount(){return s_roomCount;}

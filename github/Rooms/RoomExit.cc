@@ -1,4 +1,6 @@
 
+#include "./../Globals.h"
+#include "./../Characters.h"
 #include "RoomExit.h"
 #include "Room.h"
 #include <string>
@@ -24,6 +26,8 @@ RoomExit::RoomExit(bool isBlocked, bool isHidden, Room* room1, Room* room2){
         << endl;
     }
   }
+
+  m_type = ROOM_EXIT;
 
   s_roomExitCount++;
 
@@ -138,6 +142,23 @@ void RoomExit::setRoom2Direction(int whichDirection){
 }
 
 //------------------------------------------------------
+// #isCurrentRoom
+//------------------------------------------------------
+bool RoomExit::isCurrentRoom(Room* room) const{
+  return (m_room1==room || m_room2==room);
+}
+//------------------------------------------------------
+// #isAdjacentRoom
+//------------------------------------------------------
+bool RoomExit::isAdjacentRoom(Room* room) const{
+  return (!isCurrentRoom(room)
+      &&(m_room1->isAdjacentRoom(room)
+        || m_room2->isAdjacentRoom(room)
+        )
+      );
+}
+
+//------------------------------------------------------
 // #isBlocked
 //------------------------------------------------------
 bool RoomExit::isBlocked(){
@@ -217,9 +238,34 @@ void RoomExit::display(std::ostream& o) const{
 //------------------------------------------------------
 // #activate
 //------------------------------------------------------
-bool RoomExit::activate(const int action, const int state, const int direction, Object* target){
+bool RoomExit::activate(int action, int state, int direction, Object* target, int extra){
+  int exitDirection;
+  string exitDirectionString;
+
+  Room* currentRoom = Character::PLAYER->getCurrentRoom();
+  bool currentRoomFlag = isCurrentRoom(currentRoom);
+
+  if(currentRoomFlag){
+    exitDirection = currentRoom->getRoomExitDirection(this);
+    exitDirectionString = compassDirectionToString(exitDirection, true);
+  }
+
   switch(action){
     case BLOCK_SET:
+      if(currentRoomFlag){
+        if(state && !isBlocked()){
+          cout << "The "
+            << exitDirectionString
+            << " exit slides open."
+            << endl;
+        }
+        else if(!state && isBlocked()){
+          cout << "The "
+            << exitDirectionString
+            << " exit slides shut."
+            << endl;
+        }
+      }
       setBlocked(state);
       return true;
 
@@ -228,6 +274,20 @@ bool RoomExit::activate(const int action, const int state, const int direction, 
       return true;
 
     case BLOCK_TOGGLE:
+      if(currentRoomFlag){
+        if(isBlocked()){
+          cout << "The "
+            << exitDirectionString
+            << " exit slides open."
+            << endl;
+        }
+        else{
+          cout << "The "
+            << exitDirectionString
+            << " exit slides shut."
+            << endl;
+        }
+      }
       setBlocked(!isBlocked());
       return true;
 
@@ -236,7 +296,7 @@ bool RoomExit::activate(const int action, const int state, const int direction, 
       return true;
 
     default:
-      return false;
+      return Object::activate(action, state, direction, target, extra);
   }
 }
 

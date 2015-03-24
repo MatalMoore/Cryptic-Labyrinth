@@ -28,6 +28,8 @@ Room::Room(bool isVisible, bool* whichExits, string description){
 
   s_roomCount++;
 
+  m_type = ROOM;
+
   m_roomType = ROOM;
   m_maxExits = 4;
 
@@ -70,7 +72,9 @@ Room::Room(bool isVisible, bool* whichExits, string description){
   else{
     m_whichExits = whichExits;
   }
+
   m_exits = new RoomExit*[getMaxExits()];
+
   for(int i=0; i<getMaxExits(); i++){
     if(exitExists(getRoomExitDirection(i))){
       m_exits[i] = new RoomExit();
@@ -79,6 +83,10 @@ Room::Room(bool isVisible, bool* whichExits, string description){
       m_exits[i] = NULL;
     }
   }
+
+  m_title = "room";
+  m_descriptor = "a";
+
   if(description.empty()){
     m_description = "You are in a square room.";
   }
@@ -111,47 +119,42 @@ Room::~Room(){
       else{
         cerr << m_exits[i]->getRoom1()->getName();
       }
+
       cerr << " - ";
+
       if(m_exits[i]->getRoom2() == NULL){
         cerr << "NULL";
       }
       else{
         cerr << m_exits[i]->getRoom2()->getName();
       }
-      m_exits[i]->getRoom2();
+
       cerr << endl;
     }
   }
 #endif
+
   for(int i=0; i<getMaxExits(); i++){
-    //cerr << i;
     if(m_exits[i] != NULL){
-      //cerr << " a";
       if(m_exits[i]->getRoom1() == this){
-        //cerr << " one";
         m_exits[i]->setRoom1(NULL);
+
         if(m_exits[i]->getRoom2() == NULL){
-          //cerr << " alpha\n";
           delete m_exits[i];
           m_exits[i] = NULL;
         }
-        //cerr << " beta";
       }
       else if(m_exits[i]->getRoom2() == this){
         m_exits[i]->setRoom2(NULL);
-        //cerr << " two";
+
         if(m_exits[i]->getRoom1() == NULL){
-          //cerr << " alpha\n";
           delete m_exits[i];
           m_exits[i] = NULL;
         }
-        //cerr << " beta";
       }
-      //cerr << " three";
     }
-    //cerr << " b";
-    //cerr << endl;
   }
+
 #if 0
   cerr << "After:" << endl;
   for(int i=0; i<getMaxExits(); i++){
@@ -490,13 +493,28 @@ bool Room::isInputValid(int whichDirection) const{
 // #isExitBlocked
 //------------------------------------------------------
 bool Room::isExitBlocked(int whichDirection) const{
+  int toWhichDirection;
+  Room* roomHold;
+  RoomExit* roomExitHold;
+
   if(!isInputValid(whichDirection)){
     displayInvalidInput(whichDirection, "isExitBlocked");
 
     return false;
   }
+
   if(exitExists(whichDirection)){
-    return m_exits[directionToIndex(whichDirection)]->isBlocked();
+    roomHold = getRoom(whichDirection);
+
+    if(roomHold->getRoomType() == ROTATING_ROOM){
+      roomExitHold = getExit(whichDirection);
+      toWhichDirection = roomHold->getRoomExitDirection(roomExitHold);
+
+      return roomHold->isExitBlocked(toWhichDirection);
+    }
+    else{
+      return m_exits[directionToIndex(whichDirection)]->isBlocked();
+    }
   }
   else{
     return false;
@@ -550,6 +568,30 @@ bool Room::isThisRoom1OfExit(int whichDirection) const{
   }
 
   return m_exits[directionToIndex(whichDirection)]->getRoom1()==this;
+}
+//------------------------------------------------------
+// #isAdjacentRoom
+//------------------------------------------------------
+bool Room::isCurrentRoom(Room* room) const{
+  return (this == room);
+}
+//------------------------------------------------------
+// #isAdjacentRoom
+//------------------------------------------------------
+bool Room::isAdjacentRoom(Room* room) const{
+  if(room == NULL){
+    displayNullInput(NO_DIRECTION, "isAdjacentRoom");
+
+    return false;
+  }
+
+  for(int i=0; i<m_maxExits; i++){
+    if(getRoom(getRoomExitDirection(i)) == room){
+      return true;
+    }
+  }
+
+  return false;
 }
 //------------------------------------------------------
 // #isVisible
@@ -685,7 +727,16 @@ int Room::getRoomExitDirection(RoomExit* exit) const{
 // #displayInvalidInput
 //------------------------------------------------------
 void Room::displayInvalidInput(int whichDirection, string methodName) const{
-  cerr << "Invalid input: " << getName() << "->" << methodName << "(" << compassDirectionToString(whichDirection) << ") -" << getRoomType() << "-" << endl;
+  cerr << "Invalid input: "
+    << getName()
+    << "->"
+    << methodName
+    << "("
+    << compassDirectionToString(whichDirection)
+    << ") -"
+    << getRoomType()
+    << "-"
+    << endl;
 }
 //------------------------------------------------------
 // #displayNullInput
@@ -728,6 +779,7 @@ void Room::displayExits(std::ostream& o) const{
       if(
           exitExists(getRoomExitDirection(i))
           && isExitBlocked(getRoomExitDirection(i))
+          && !isExitHidden(getRoomExitDirection(i))
         ){
         o << "\n";
         o << "The "
@@ -740,12 +792,63 @@ void Room::displayExits(std::ostream& o) const{
   return;
 }
 //------------------------------------------------------
+// #displayObjects
+//------------------------------------------------------
+void Room::displayObjects(std::ostream& o) const{
+  if(m_objectCount > 0){
+    int whichDirection;
+    string holdString;
+    Object* holdObject;
+
+    for(int i=0; i<m_objectNext; i++){
+      holdObject = m_objects[i];
+
+      if(holdObject == NULL){
+        continue;
+      }
+
+      whichDirection = holdObject->getPosition();
+
+      o << "There is "
+        << holdObject->getDescription()
+        << " in the ";
+
+      if(whichDirection==CENTER
+          || isNaturalDirection(whichDirection)
+        ){
+        o << compassDirectionToString(whichDirection, true);
+      }
+      else{
+        o << compassDirectionToString(whichDirection, false);
+      }
+
+      o << " of the room";
+
+      holdString = holdObject->getSubDescription();
+
+      if(!holdString.empty()){
+        o << " on the "
+          << holdString;
+      }
+
+      o << ".\n";
+    }
+  }
+  else{
+    return;
+  }
+}
+//------------------------------------------------------
 // #display
 //------------------------------------------------------
 void Room::display(std::ostream& o) const{
   o << "\n";
   o << "------------------------------------------------\n";
   o << getDescription() << "\n";
+  if(m_objectCount > 0){
+    o << "\n";
+    displayObjects(o);
+  }
   o << "\n";
   displayExits(o);
   o << "\n";
@@ -755,40 +858,26 @@ void Room::display(std::ostream& o) const{
 //------------------------------------------------------
 // #activate
 //------------------------------------------------------
-bool Room::activate(const int action, const int state, const int direction, Object* target){
+bool Room::activate(int action, int state, int direction, Object* target, int extra){
   switch(action){
     case BLOCK_SET:
     case HIDE_SET:
     case BLOCK_TOGGLE:
     case HIDE_TOGGLE:
       if(exitExists(direction)){
-        return getExit(direction)->activate(action, state, direction, target);
+        return getExit(direction)->activate(action, state, direction, target, extra);
       }
       else{
         return false;
       }
 
-    default:
-      return false;
-  }
+    case VISIBLE_SET:
+      setVisible(state);
+      true;
 
-#if 0
-  if(action==BLOCK_SET
-      || action==HIDE_SET
-      || action==BLOCK_TOGGLE
-      || action==HIDE_TOGGLE
-    ){
-    if(exitExists(direction)){
-      return getExit(direction)->activate(action, state, direction, target);
-    }
-    else{
-      return false;
-    }
+    default:
+      return Container::activate(action, state, direction, target, extra);
   }
-  else{
-    return false;
-  }
-#endif
 }
 
 //------------------------------------------------------

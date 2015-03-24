@@ -12,7 +12,9 @@ unsigned int Character::s_characterCount = 0;
 unsigned int Character::s_characterMax;
 Character** Character::s_characters;
 
-//------------------------------------------------------
+const Character* Character::PLAYER = new Character;
+
+//-----------------------------------------------------
 // #Character (Constructor)
 //------------------------------------------------------
 Character::Character(Room* initialRoom, int initialPosition, int initialFacing){
@@ -21,6 +23,7 @@ Character::Character(Room* initialRoom, int initialPosition, int initialFacing){
     s_characterMax = 100;
     s_characters = new Character*[s_characterMax];
     if(SHOW_MESSAGES){
+      cout << "-!- " << SHOW_MESSAGES << " -!-" << endl;
       cerr << "s_characters: Allocated" << endl
         << endl;
     }
@@ -125,6 +128,24 @@ void Character::setCurrentRoom(Room* room) const{
 }
 
 //------------------------------------------------------
+// #isCurrentRoom
+//------------------------------------------------------
+bool Character::isCurrentRoom(Room* room) const{
+  return (m_currentRoom == room);
+}
+//------------------------------------------------------
+// #isAdjacentRoom
+//------------------------------------------------------
+bool Character::isAdjacentRoom(Room* room) const{
+  if(m_currentRoom == NULL){
+    return false;
+  }
+  else{
+    return m_currentRoom->isAdjacentRoom(room);
+  }
+}
+
+//------------------------------------------------------
 // #getPosition
 //------------------------------------------------------
 unsigned int Character::getPosition() const{
@@ -176,13 +197,13 @@ string Character::getCharacterType() const{
 //------------------------------------------------------
 // #activate
 //------------------------------------------------------
-bool Character::activate(int action, int state, int direction, Room* target){
+bool Character::activate(int action, int state, int direction, Room* target, int extra){
   switch(action){
-    case POSITION:
+    case POSITION_SET:
       setPosition(state);
       return true;
 
-    case FACE:
+    case FACE_SET:
       setFacing(state);
       return true;
 
@@ -191,6 +212,6 @@ bool Character::activate(int action, int state, int direction, Room* target){
       return true;
 
     default:
-      return false;
+      return Container::activate(action, state, direction, target);
   }
 }

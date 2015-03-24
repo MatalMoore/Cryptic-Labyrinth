@@ -31,7 +31,7 @@ class RotatingRoom: public RoundRoom{
     virtual void displayExits(std::ostream& o) const;
     virtual void display(std::ostream& o) const;
 
-    virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+    virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL, const int extra=0);
 
     int getAxisRoomExitDirection(const int whichExitIndex=0) const;
 

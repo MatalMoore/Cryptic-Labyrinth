@@ -9,7 +9,7 @@ using namespace std;
 //------------------------------------------------------
 // #stringsToSequence
 //------------------------------------------------------
-string stringsToSequence(string* strings, int numberOfStrings){
+string stringsToSequence(const string* strings, int numberOfStrings){
   if(numberOfStrings < 2){
     return strings[0];
   }
@@ -74,6 +74,14 @@ int oppositeDirection(int compassDirection){
 int rotateDirection(int compassDirection, int interval){
   int newDirection;
 
+  if(!isGoodDirection(compassDirection)){
+    return NO_DIRECTION;
+  }
+
+  if(compassDirection == CENTER){
+    return CENTER;
+  }
+
   interval %= DIRECTION_MAX;
 
   if(interval == 0){
@@ -113,10 +121,24 @@ int stringToCompassDirection(string value){
   return NO_DIRECTION;
 }
 
+//------------------------------------------------------
+// #isNaturalDirection
+//------------------------------------------------------
 bool isNaturalDirection(int whichDirection){
   return (
       whichDirection>=N
-      && whichDirection<=NNW
-      && whichDirection%2==0
+      && whichDirection<DIRECTION_MAX
+      && whichDirection%2==N%2
+      );
+}
+//------------------------------------------------------
+// #isGoodDirection
+//------------------------------------------------------
+bool isGoodDirection(int whichDirection){
+  return (
+      whichDirection==CENTER
+      ||(whichDirection>=N
+        && whichDirection<DIRECTION_MAX
+        )
       );
 }

@@ -9,8 +9,6 @@
 #include <string>
 using namespace std;
 
-const Character* PLAYER = new Character;
-
 //------------------------------------------------------
 // #parse
 //------------------------------------------------------
@@ -61,7 +59,8 @@ bool parse(const string input){
   }
 
   if(argc >= 1){
-    isValid = executeCommand(argv, argvUpper, argc, PLAYER);
+    isValid = executeCommand(argv, argvUpper, argc, Character::PLAYER);
+
     if(argvUpper[0] == commandEXIT){
       exitFlag = isValid;
     }
@@ -72,6 +71,7 @@ bool parse(const string input){
 
   if(!isValid){
     cout << "Invalid input: \"";
+
     for(i=0; i<argc-1; i++){
       cout << argv[i] << " ";
     }

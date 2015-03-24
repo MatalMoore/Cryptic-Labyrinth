@@ -15,6 +15,9 @@ class Character: public Container{
     void setFacing(int whichDirection) const;
     void setCurrentRoom(Room* room) const;
 
+    virtual bool isCurrentRoom(Room* room) const;
+    virtual bool isAdjacentRoom(Room* room) const;
+
     unsigned int getPosition() const;
     unsigned int getFacing() const ;
     Room* getCurrentRoom() const;
@@ -26,12 +29,14 @@ class Character: public Container{
 
     std::string getCharacterType() const;
 
-    virtual bool activate(const int action=0, const int state=0, const int direction=0, Room* target=NULL);
+    virtual bool activate(const int action=0, const int state=0, const int direction=0, Room* target=NULL, const int extra=0);
 
     static unsigned int getNextCharacterID(){return s_nextCharacterID;}
     static unsigned int getCharacterCount(){return s_characterCount;}
     static unsigned int getCharacterMax(){return s_characterMax;}
     static Character* getCharacterFromID(unsigned int characterID){return s_characters[characterID];}
+
+    const static Character* PLAYER;
 
   protected:
     mutable unsigned int m_position;

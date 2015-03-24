@@ -41,8 +41,8 @@ int main(){
   cout << "myRoom->linkRooms(S, new CorridorRoom(S));" << endl;
   myRoom->linkRooms(S, new CorridorRoom(S));
 
-  cout << "myRoom->linkRooms(NE, new RotatingRoom(NE, true));" << endl;
-  myRoom->linkRooms(NE, new RotatingRoom(NE, true));
+  cout << "myRoom->linkRooms(NE, new RotatingRoom(NE));" << endl;
+  myRoom->linkRooms(NE, new RotatingRoom(NE));
 
   cout << "myRoom->getRoom(N)->setVisible(false);" << endl;
   myRoom->getRoom(N)->setVisible(false);
@@ -71,12 +71,43 @@ int main(){
   cout << "myRoom->getRoom(NE)->linkRooms(E, new Room);" << endl;
   myRoom->getRoom(NE)->linkRooms(E, new Room);
 
+  myRoom->getRoom(S)->linkRooms(S, new RoundRoom);
+
+  cout << "Item* myItem = new Switch(true);" << endl;
+  Item* myItem = new Switch(false);
+
+  myItem->activate(ON_ACTION_SET, 0, 0, myRoom->getExit(SW), BLOCK_TOGGLE);
+
+  cout << "myRoom->addObject(myItem, CENTER, FLOOR);" << endl;
+  myRoom->addObject(myItem, CENTER, FLOOR);
+
+  cout << "Item* myItem2 = new Switch;" << endl;
+  Item* myItem2 = new Switch;
+
+  cout << "myItem2->activate(ON_ACTION_SET, 0, 0, myRoom->getExit(SE), BLOCK_TOGGLE);" << endl;
+  myItem2->activate(ON_ACTION_SET, 0, 0, myRoom->getExit(SE), BLOCK_TOGGLE);
+
+  cout << "myRoom->getRoom(SW)->addObject(myItem2, S, WALL);" << endl;
+  myRoom->getRoom(SW)->addObject(myItem2, S, WALL);
+
+  cout << "Item* myItem3 = new Switch(true);" << endl;
+  Item* myItem3 = new Switch(true);
+
+  cout << "myItem3->activate(ON_ACTION_SET, 0, E, myRoom->getRoom(NE), ROTATE_SET);" << endl;
+  myItem3->activate(ON_ACTION_SET, 0, E, myRoom->getRoom(NE), ROTATE_SET);
+
+  cout << "myItem3->activate(OFF_ACTION_SET, 0, NE, myRoom->getRoom(NE), ROTATE_SET);" << endl;
+  myItem3->activate(OFF_ACTION_SET, 0, NE, myRoom->getRoom(NE), ROTATE_SET);
+
+  cout << "myRoom->addObject(myItem3, NNW, WALL);" << endl;
+  myRoom->addObject(myItem3, NNW, WALL);
+
   cout << endl;
   cout << "Initialized" << endl;
   cout << endl;
 
-  PLAYER->setCurrentRoom(myRoom);
-  PLAYER->displayCurrentRoom();
+  Character::PLAYER->setCurrentRoom(myRoom);
+  Character::PLAYER->displayCurrentRoom();
 
   while(!exitFlag){
     cout << endl

@@ -10,8 +10,8 @@ using namespace std;
 // #CorridorRoom() (Constructor)
 //------------------------------------------------------
 CorridorRoom::CorridorRoom(int initialDirection, bool isVisible, bool* whichExits, string description){
-  int direction0 = getDirection();
-  int direction1 = oppositeDirection(direction0);
+  int direction0 = initialDirection;
+  int direction1 = oppositeDirection(initialDirection);
 
   int minDirection = min(direction0, direction1);
   int maxDirection = max(direction0, direction1);
@@ -42,6 +42,9 @@ CorridorRoom::CorridorRoom(int initialDirection, bool isVisible, bool* whichExit
 
   m_exits = new RoomExit*[m_maxExits];
 
+  m_title = "corridor";
+  m_descriptor = "a";
+
   if(description.empty()){
     sstream  <<  "You are in a corridor.\n"
       << "The corridor runs "
@@ -66,7 +69,7 @@ CorridorRoom::~CorridorRoom(){
 // #setDirection()
 //------------------------------------------------------
 void CorridorRoom::setDirection(int whichDirection){
-  int direction0 = getDirection();
+  int direction0 = whichDirection;
   int direction1 = oppositeDirection(direction0);
 
   int minDirection = min(direction0, direction1);

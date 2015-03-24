@@ -10,8 +10,11 @@ const bool SHOW_MESSAGES = false;
 const int ARGC_MAX = 20;
 
 // actiavte action constants
+// -!- MUST BE EXCLUSIVE -!-
 
-const int NOTHING = 0;
+const int DEFAULT_ACTION = -1;
+
+const int NO_ACTION = 0;
 
 const int BLOCK_SET = 1;
 const int HIDE_SET = 2;
@@ -22,8 +25,8 @@ const int HIDE_TOGGLE = 4;
 const int ROTATE = 5;
 const int ROTATE_SET = 6;
 
-const int POSITION = 7;
-const int FACE = 8;
+const int POSITION_SET = 7;
+const int FACE_SET = 8;
 
 const int ROOM_SET = 9;
 
@@ -33,10 +36,18 @@ const int OBTAIN_SET = 11;
 const int OBTAINABLE_TOGGLE = 12;
 const int OBTAIN_TOGGLE = 13;
 
+const int ON_ACTION_SET = 14;
+const int OFF_ACTION_SET = 15;
+const int SWITCH_PRESS = 16;
+
+const int VISIBLE_SET = 17;
+
+const int OBJECT_ADD = 18;
+
 // compass directions
 // -!- DIRECTIONS NEED TO BE CONTIGUOUS -!-
-// -!- NO-DIRECTION MUST ALWAYS BE SMALLEST -!-
-//
+// -!- NO_DIRECTION MUST ALWAYS BE SMALLEST -!-
+
 const int NO_DIRECTION = -3;
 
 const int OPPOSITE = -2;
@@ -61,6 +72,11 @@ const int NNW = 15;
 
 const int DIRECTION_MAX = 16;
 
+// general types
+const std::string OBJECT = "OBJECT";
+const std::string CONTAINER = "CONTAINER";
+const std::string ROOM_EXIT = "ROOM_EXIT";
+
 // room types
 const std::string ROOM = "ROOM";
 const std::string DIAGONAL_ROOM = "DIAGONAL_ROOM";
@@ -70,9 +86,15 @@ const std::string ROTATING_ROOM = "ROTATING_ROOM";
 
 // item types
 const std::string ITEM = "ITEM";
+const std::string SWITCH = "SWITCH";
 
 // character types
 const std::string CHARACTER = "CHARACTER";
+
+// other strings
+const std::string FLOOR = "floor";
+const std::string WALL = "wall";
+const std::string CEILING = "ceiling";
 
 // arrays that are used for quick access to strings
 // -!- NEED TO HAVE INDICES CORRESPONDING TO (DIRECTION - NO_DIRECTION) -!-

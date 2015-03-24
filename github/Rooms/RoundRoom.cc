@@ -31,6 +31,10 @@ RoundRoom::RoundRoom(bool isVisible, bool* whichExits, string description){
       m_exits[i] = NULL;
     }
   }
+
+  m_title = "round room";
+  m_descriptor = "a";
+
   if(description.empty()){
     m_description = "You are in a round room.";
   }

@@ -20,6 +20,9 @@ class RoomExit: public Object{
     void setRoom1Direction(int whichDirection);
     void setRoom2Direction(int whichDirection);
 
+    virtual bool isCurrentRoom(Room* room) const;
+    virtual bool isAdjacentRoom(Room* room) const;
+
     bool isBlocked();
     bool isHidden();
     Room* getRoom1();
@@ -29,7 +32,7 @@ class RoomExit: public Object{
 
     virtual void display(std::ostream& o) const;
 
-    virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+    virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL, const int extra=0);
 
     static unsigned int getNextRoomExitID(){return s_nextRoomExitID;}
     static unsigned int getRoomExitCount(){return s_roomExitCount;}

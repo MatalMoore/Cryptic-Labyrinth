@@ -19,13 +19,13 @@ Container.o: ./Superclasses/Container.h ./Superclasses/Container.cc Object.o
 	g++ -c ./Superclasses/Container.cc
 
 #Rooms
-Rooms.o: Rooms.h Rooms.cc Superclasses.o RoomExit.o Room.o DiagonalRoom.o CorridorRoom.o RoundRoom.o RotatingRoom.o
+Rooms.o: Rooms.h Rooms.cc Superclasses.o  RoomExit.o Room.o DiagonalRoom.o CorridorRoom.o RoundRoom.o RotatingRoom.o
 	g++ -c Rooms.cc
 
 RoomExit.o: ./Rooms/RoomExit.h ./Rooms/RoomExit.cc ./Rooms/Room.h ./Rooms/Room.cc Superclasses.o
 	g++ -c ./Rooms/RoomExit.cc
 
-Room.o: ./Rooms/Room.h ./Rooms/Room.cc ./Rooms/RoomExit.h ./Rooms/RoomExit.cc Superclasses.o Globals.o
+Room.o: ./Rooms/Room.h ./Rooms/Room.cc ./Rooms/RoomExit.h ./Rooms/RoomExit.cc Globals.o Superclasses.o
 	g++ -c ./Rooms/Room.cc
 
 DiagonalRoom.o: ./Rooms/DiagonalRoom.h ./Rooms/DiagonalRoom.cc Room.o
@@ -37,24 +37,24 @@ CorridorRoom.o: ./Rooms/CorridorRoom.h ./Rooms/CorridorRoom.cc Room.o
 RoundRoom.o: ./Rooms/RoundRoom.h ./Rooms/RoundRoom.cc Room.o
 	g++ -c ./Rooms/RoundRoom.cc
 
-RotatingRoom.o: ./Rooms/RotatingRoom.h ./Rooms/RotatingRoom.cc RoundRoom.o CorridorRoom.o
+RotatingRoom.o: ./Rooms/RotatingRoom.h ./Rooms/RotatingRoom.cc RoundRoom.o CorridorRoom.o Globals.o Characters.o
 	g++ -c ./Rooms/RotatingRoom.cc
 
 #Items
-Items.o: Items.h Items.cc Superclasses.h Item.o Switch.o
+Items.o: Items.h Items.cc Superclasses.o Item.o Switch.o
 	g++ -c Items.cc
 
 Item.o: ./Items/Item.h ./Items/Item.cc Superclasses.o
 	g++ -c ./Items/Item.cc
 
-Switch.o: ./Items/Switch.h ./Items/Switch.cc Item.o
+Switch.o: ./Items/Switch.h ./Items/Switch.cc Item.o Superclasses.o Characters.o
 	g++ -c ./Items/Switch.cc
 
 #Characters
-Characters.o: Characters.h Characters.cc Superclasses.h Character.o
+Characters.o: Characters.h Characters.cc Superclasses.o Character.o
 	g++ -c Characters.cc
 
-Character.o: ./Characters/Character.h ./Characters/Character.cc
+Character.o: ./Characters/Character.h ./Characters/Character.cc Globals.o Superclasses.o
 	g++ -c ./Characters/Character.cc
 
 #System

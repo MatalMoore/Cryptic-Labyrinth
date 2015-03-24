@@ -2,6 +2,7 @@
 #include "RotatingRoom.h"
 #include "CorridorRoom.h"
 #include "./../Globals.h"
+#include "./../Characters.h"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -55,6 +56,9 @@ RotatingRoom::RotatingRoom(int initialDirection, bool areOtherExitsVisible, bool
       m_exits[i] = NULL;
     }
   }
+
+  m_title = "rotating room";
+  m_descriptor = "a";
 
   if(description.empty()){
     m_description = "You are on an axis in a round room.";
@@ -113,11 +117,11 @@ bool RotatingRoom::isExitBlocked(int whichDirection) const{
       return false;
     }
     if(exitExists(whichDirection)){
-      if(isDirectionOnAxis(whichDirection)){
-        return RoundRoom::isExitBlocked(whichDirection);
+      if(!isDirectionOnAxis(whichDirection)){
+        return true;
       }
       else{
-        return false;
+        return getExit(whichDirection)->isBlocked();
       }
     }
     else{
@@ -184,11 +188,13 @@ void RotatingRoom::rotate(int interval){
   // This assumes the directions are in a clockwise
   //  order from 0 to DIRECTION_MAX
 
+  int i;
   int newDirection;
   int axisRoomDirection = getAxisRoomExitDirection();
   int directionHold;
   bool isExitHiddenHold;
   bool isExitBlockedHold;
+  Object* holdObject;
   RoomExit* roomExitHold = NULL;
   Room* roomHold = NULL;
 
@@ -205,9 +211,33 @@ void RotatingRoom::rotate(int interval){
 
   m_axisRoom->setDirection(newDirection);
 
-  for(int i=0; i<2; i++){
+  for(i=0; i<2; i++){
     m_axisRoom->setExit(newDirection, getExit(newDirection));
     newDirection = oppositeDirection(newDirection);
+  }
+
+  for(i=0; i<m_objectNext; i++){
+    holdObject = m_objects[i];
+
+    if(holdObject == NULL){
+      continue;
+    }
+
+    if(m_areOtherExitsVisible){
+      if(holdObject->getSubDescription() == FLOOR){
+        holdObject->setPosition(rotateDirection(holdObject->getPosition(), interval));
+      }
+      else{
+        continue;
+      }
+    }
+    else{
+        holdObject->setPosition(rotateDirection(holdObject->getPosition(), interval));
+    }
+  }
+
+  if(Character::PLAYER->isCurrentRoom(this)){
+    cout << "The room rotates with a rumble." << endl;
   }
 }
 
@@ -274,8 +304,12 @@ void RotatingRoom::display(std::ostream& o) const{
       << compassDirectionToString(minDirection)
       << " to "
       << compassDirectionToString(maxDirection)
-      << ".\n"
-      << "\n";
+      << ".\n";
+    o << "\n";
+    if(m_objectCount > 0){
+      displayObjects(o);
+      o << "\n";
+    }
     if(isVisible()
         &&(areAllAxisExitsHidden()
           || areThereNoAxisExits()
@@ -287,21 +321,28 @@ void RotatingRoom::display(std::ostream& o) const{
       m_axisRoom->displayExits(o);
       displayExits(o);
     }
-    o << "\n------------------------------------------------";
+    o << "\n";
+    o << "------------------------------------------------";
   }
   else{
-    m_axisRoom->display(o);
+    o << "\n";
+    o << "------------------------------------------------\n";
+    o << m_axisRoom->getDescription() << "\n";
+    o << "\n";
+    if(m_objectCount > 0){
+      displayObjects(o);
+      o << "\n";
+    }
+    m_axisRoom->displayExits(o);
+    o << "\n";
+    o << "------------------------------------------------";
   }
 }
 
 //------------------------------------------------------
 // #activate
 //------------------------------------------------------
-bool RotatingRoom::activate(int action, int state, int direction, Object* target){
-  if(!(action==ROTATE || action==ROTATE_SET)){
-    return RoundRoom::activate(action, state, direction, target);
-  }
-
+bool RotatingRoom::activate(int action, int state, int direction, Object* target, int extra){
   switch(action){
     case ROTATE:
       rotate(state);
@@ -317,27 +358,8 @@ bool RotatingRoom::activate(int action, int state, int direction, Object* target
       }
 
     default:
-      return false;
+      return RoundRoom::activate(action, state, direction, target, extra);
   }
-  
-#if 0
-  else if(action == ROTATE){
-    rotate(state);
-    return true;
-  }
-  else if(action == ROTATE_SET){
-    if(isInputValid(direction)){
-      rotate(direction - getAxisRoomExitDirection());
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
-  else{
-    return false;
-  }
-#endif
 }
 
 //------------------------------------------------------

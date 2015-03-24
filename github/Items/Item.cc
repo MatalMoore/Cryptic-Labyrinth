@@ -27,6 +27,8 @@ Item::Item(bool isObtainable, bool isObtained, std::string description){
 
   s_itemCount++;
 
+  m_type = ITEM;
+
   m_itemType = ITEM;
 
   stringstream charsOfID;
@@ -116,6 +118,7 @@ bool Item::isObtainable() const{
 bool Item::isObtained() const{
   return m_isObtained;
 }
+
 //------------------------------------------------------
 // #getItemType
 //------------------------------------------------------
@@ -126,7 +129,7 @@ string Item::getItemType() const{
 //------------------------------------------------------
 // #activate
 //------------------------------------------------------
-bool Item::activate(const int action, const int state, const int direction, Object* target){
+bool Item::activate(int action, int state, int direction, Object* target, int extra){
   switch(action){
     case OBTAINABLE_SET:
       setObtainable(state);
@@ -145,6 +148,6 @@ bool Item::activate(const int action, const int state, const int direction, Obje
       return true;
 
     default:
-      return false;
+      return Container::activate(action, state, direction, target, extra);
   }
 }
