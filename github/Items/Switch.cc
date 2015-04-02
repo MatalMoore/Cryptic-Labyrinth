@@ -9,21 +9,25 @@ using namespace std;
 //------------------------------------------------------
 // #Switch (Constructor)
 //------------------------------------------------------
-Switch::Switch(bool canToggle, bool isOn, int action, int state, int direction, Object* target){
+Switch::Switch(bool canToggle){
   m_itemType = SWITCH;
 
-  m_isOn = isOn;
+  m_isOn = false;
   m_canToggle = canToggle;
 
-  m_onAction = action;
-  m_onState = state;
-  m_onDirection = direction;
-  m_onTarget = target;
+  m_actionMax = 10;
+  m_onActionCount = 0;
+  m_offActionCount = 0;
 
-  m_offAction = m_onAction;
-  m_offState = m_onState;
-  m_offDirection =  m_onDirection;
-  m_offTarget = m_onTarget;
+  m_onActions = new int[m_actionMax];
+  m_onStates = new int[m_actionMax];
+  m_onDirections = new int[m_actionMax];
+  m_onTargets = new Object*[m_actionMax];
+
+  m_offActions = new int[m_actionMax];
+  m_offStates = new int[m_actionMax];
+  m_offDirections = new int[m_actionMax];
+  m_offTargets = new Object*[m_actionMax];
 
   m_title = "switch";
   m_descriptor = "a";
@@ -33,26 +37,82 @@ Switch::Switch(bool canToggle, bool isOn, int action, int state, int direction, 
 // #Switch (Destructor)
 //------------------------------------------------------
 Switch::~Switch(){
+  delete [] m_onActions;
+  delete [] m_onStates;
+  delete [] m_onDirections;
+  delete [] m_onTargets;
+
+  delete [] m_offActions;
+  delete [] m_offStates;
+  delete [] m_offDirections;
+  delete [] m_offTargets;
 }
 
 //------------------------------------------------------
-// #setOnAction
+// #addOnAction
 //------------------------------------------------------
-void Switch::setOnAction(int action, int state, int direction, Object* target){
-  m_onAction = action;
-  m_onState = state;
-  m_onDirection = direction;
-  m_onTarget = target;
+void Switch::addOnAction(int action, int state, int direction, Object* target){
+  if(m_onActionCount >= m_actionMax){
+    cerr << "Error: "
+      << getName()
+      << " cannot have more than "
+      << m_actionMax
+      << " on_actions"
+      << endl;
+
+    return;
+  }
+
+  m_onActions[m_onActionCount] = action;
+  m_onStates[m_onActionCount] = state;
+  m_onDirections[m_onActionCount] = direction;
+  m_onTargets[m_onActionCount] = target;
+
+  m_onActionCount++;
 }
 
 //------------------------------------------------------
-// #setOffAction
+// #addOffAction
 //------------------------------------------------------
-void Switch::setOffAction(int action, int state, int direction, Object* target){
-  m_offAction = action;
-  m_offState = state;
-  m_offDirection = direction;
-  m_offTarget = target;
+void Switch::addOffAction(int action, int state, int direction, Object* target){
+  if(m_offActionCount >= m_actionMax){
+    cerr << "Error: "
+      << getName()
+      << " cannot have more than "
+      << m_actionMax
+      << " off_actions"
+      << endl;
+
+    return;
+  }
+
+  m_offActions[m_offActionCount] = action;
+  m_offStates[m_offActionCount] = state;
+  m_offDirections[m_offActionCount] = direction;
+  m_offTargets[m_offActionCount] = target;
+
+  m_offActionCount++;
+}
+
+//------------------------------------------------------
+// #deleteLastOnAction
+//------------------------------------------------------
+void Switch::deleteLastOnAction(){
+    if(m_onActionCount == 0){
+      return;
+    }
+
+    m_onActionCount--;
+}
+//------------------------------------------------------
+// #deleteLastOffAction
+//------------------------------------------------------
+void Switch::deleteLastOffAction(){
+    if(m_offActionCount == 0){
+      return;
+    }
+
+    m_offActionCount--;
 }
 
 //------------------------------------------------------
@@ -69,82 +129,119 @@ bool Switch::canToggle() const{
 }
 
 //------------------------------------------------------
+// #activateAll
+//------------------------------------------------------
+bool Switch::activateAll() const{
+  int i;
+
+  bool activateFlagHold;
+  bool adjacentRoomFlagHold;
+  bool distantRoomFlagHold;
+
+  bool activateFlag = false;
+  bool adjacentRoomFlag = false;
+  bool distantRoomFlag = false;
+
+  Object* objectHold;
+
+  Room* currentRoom = Character::PLAYER->getCurrentRoom();
+
+  if(isOn()){
+    for(i=0; i<m_offActionCount; i++){
+      objectHold = m_offTargets[i];
+
+      if(objectHold == NULL){
+        cerr << "Error: "
+          << getName()
+          << " attempted to activate a NULL m_offTargets["
+          << i
+          << "]"
+          << endl;
+
+        return false;
+      }
+
+      activateFlagHold = objectHold->activate(m_offActions[i], m_offStates[i], m_offDirections[i]);
+
+      if(activateFlagHold){
+        adjacentRoomFlagHold = objectHold->isAdjacentRoom(currentRoom);
+        distantRoomFlagHold = (
+            !objectHold->isCurrentRoom(currentRoom)
+            && !adjacentRoomFlagHold
+            );
+
+        activateFlag = (activateFlag || activateFlagHold);
+        adjacentRoomFlag = (adjacentRoomFlag || adjacentRoomFlagHold);
+        distantRoomFlag = (distantRoomFlag || distantRoomFlagHold);
+      }
+    }
+  }
+  else{
+    for(i=0; i<m_onActionCount; i++){
+      objectHold = m_onTargets[i];
+
+      if(objectHold == NULL){
+        cerr << "Error: "
+          << getName()
+          << " attempted to activate a NULL m_onTargets["
+          << i
+          << "]"
+          << endl;
+
+        return false;
+      }
+
+      activateFlagHold = objectHold->activate(m_onActions[i], m_onStates[i], m_onDirections[i]);
+
+      if(activateFlagHold){
+        adjacentRoomFlagHold = objectHold->isAdjacentRoom(currentRoom);
+        distantRoomFlagHold = (
+            !objectHold->isCurrentRoom(currentRoom)
+            && !adjacentRoomFlagHold
+            );
+
+        activateFlag = (activateFlag || activateFlagHold);
+        adjacentRoomFlag = (adjacentRoomFlag || adjacentRoomFlagHold);
+        distantRoomFlag = (distantRoomFlag || distantRoomFlagHold);
+      }
+    }
+  }
+
+  if(activateFlag){
+    if(canToggle()){
+      m_isOn = !m_isOn;
+    }
+
+    if(adjacentRoomFlag){
+      cout << ADJACENT_SOUND << endl;
+    }
+
+    if(distantRoomFlag){
+      cout << DISTANT_SOUND << endl;
+    }
+  }
+
+  return activateFlag;
+}
+
+//------------------------------------------------------
 // #activate
 //------------------------------------------------------
 bool Switch::activate(int action, int state, int direction, Object* target, int extra){
-  bool activateFlag;
-  Object* roomCheckTarget;
-
   switch(action){
-    case(DEFAULT_ACTION):
+    case DEFAULT_ACTION:
       return activate(SWITCH_PRESS);
 
-    case(ON_ACTION_SET):
-      setOnAction(extra, state, direction, target);
-      return true;
+    case ON_ACTION_ADD:
+      addOnAction(extra, state, direction, target);
+      return (m_onActionCount >= m_actionMax);
 
-    case(OFF_ACTION_SET):
-      setOffAction(extra, state, direction, target);
-      return true;
+    case OFF_ACTION_ADD:
+      addOffAction(extra, state, direction, target);
+      return (m_offActionCount >= m_actionMax);
 
     case SWITCH_PRESS:
-      if(canToggle()){
-        if(isOn()){
-          if(m_offTarget == NULL){
-            cerr << "Error: "
-              << getName()
-              << " attempted to actiavte a NULL m_offTarget"
-              << endl;
-
-            return false;
-          }
-
-          activateFlag = m_offTarget->activate(m_offAction, m_offState, m_offDirection);
-          cerr << "Toggled off" << endl;
-          roomCheckTarget = m_offTarget;
-        }
-        else{
-          if(m_onTarget == NULL){
-            cerr << "Error: "
-              << getName()
-              << " attempted to actiavte a NULL m_onTarget"
-              << endl;
-
-            return false;
-          }
-
-          activateFlag = m_onTarget->activate(m_onAction, m_onState, m_onDirection);
-          roomCheckTarget = m_onTarget;
-        }
-
-        if(activateFlag){
-          m_isOn = !isOn();
-        }
-      }
-      else{
-        if(m_onTarget == NULL){
-          cerr << "Error: "
-            << getName()
-            << " attempted to actiavte a NULL m_onTarget"
-            << endl;
-
-          return false;
-        }
-
-        activateFlag =  m_onTarget->activate(m_onAction, m_onState, m_onDirection);
-        roomCheckTarget = m_onTarget;
-      }
-
-      if(activateFlag){
-        if(roomCheckTarget->isAdjacentRoom(Character::PLAYER->getCurrentRoom())){
-          cout << ADJACENT_SOUND << endl;
-        }
-        else if(!roomCheckTarget->isCurrentRoom(Character::PLAYER->getCurrentRoom())){
-          cout << DISTANT_SOUND << endl;
-        }
-      }
-
-      return activateFlag;
+      return activateAll();
 
     default:
       return Item::activate(action, state, direction, target, extra);

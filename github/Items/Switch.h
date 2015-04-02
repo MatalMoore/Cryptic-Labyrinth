@@ -11,31 +11,40 @@ const std::string DISTANT_SOUND = "There is a sound from a distant room ...";
 
 class Switch: public Item{
   public:
-    Switch(const bool canToggle=false, const bool isOn=false, const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+    Switch(const bool canToggle=false);
     ~Switch();
 
-    void setOnAction(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+    void addOnAction(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
 
-    void setOffAction(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+    void addOffAction(const int action=0, const int state=0, const int direction=0, Object* target=NULL);
+
+    void deleteLastOnAction();
+    void deleteLastOffAction();
 
     bool isOn() const;
     bool canToggle() const;
 
+    bool activateAll() const;
+
     virtual bool activate(const int action=0, const int state=0, const int direction=0, Object* target=NULL, const int extra=0);
 
   protected:
-    bool m_isOn;
+    mutable bool m_isOn;
     bool m_canToggle;
 
-    int m_onAction;
-    int m_onState;
-    int m_onDirection;
-    Object* m_onTarget;
+    unsigned int m_actionMax;
+    unsigned int m_onActionCount;
+    unsigned int m_offActionCount;
 
-    int m_offAction;
-    int m_offState;
-    int m_offDirection;
-    Object* m_offTarget;
+    int* m_onActions;
+    int* m_onStates;
+    int* m_onDirections;
+    Object** m_onTargets;
+
+    int* m_offActions;
+    int* m_offStates;
+    int* m_offDirections;
+    Object** m_offTargets;
 };
 
 #endif

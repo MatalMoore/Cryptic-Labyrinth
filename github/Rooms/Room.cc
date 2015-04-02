@@ -324,7 +324,7 @@ void Room::deleteRoom(int whichDirection, bool isExitDeleted){
 //------------------------------------------------------
 // #linkRooms
 //------------------------------------------------------
-void Room::linkRooms(int whichDirection, Room* room, int toWhichDirection, RoomExit* roomExit){
+void Room::linkRooms(int whichDirection, Room* room, RoomExit* roomExit, int toWhichDirection){
 #if 0
   cerr << "==========" << endl;
       cerr << getName() << "->linkRooms("
@@ -362,6 +362,8 @@ void Room::linkRooms(int whichDirection, Room* room, int toWhichDirection, RoomE
   if(room == NULL){
     room = new Room;
   }
+
+  //cerr << "Linking " << getName() << " to " << room->getName() << endl;
 
   if(!room->isInputValid(toWhichDirection)){
     room->displayInvalidInput(toWhichDirection, "linkRooms");
@@ -403,6 +405,20 @@ void Room::linkRooms(int whichDirection, Room* room, int toWhichDirection, RoomE
     setExit(whichDirection, roomExit);
     room->setExit(toWhichDirection, roomExit);
   }
+}
+
+//------------------------------------------------------
+// #linkRooms
+//------------------------------------------------------
+void Room::linkRooms(int whichDirection, int roomID, RoomExit* roomExit, int toWhichDirection){
+  linkRooms(whichDirection, Room::getRoomFromID(roomID), roomExit, toWhichDirection);
+}
+
+//------------------------------------------------------
+// #linkRooms
+//------------------------------------------------------
+void Room::linkRooms(int whichDirection, int roomID, int roomExitID, int toWhichDirection){
+  linkRooms(whichDirection, Room::getRoomFromID(roomID), RoomExit::getRoomExitFromID(roomExitID), toWhichDirection);
 }
 
 //------------------------------------------------------
@@ -843,7 +859,7 @@ void Room::displayObjects(std::ostream& o) const{
 //------------------------------------------------------
 void Room::display(std::ostream& o) const{
   o << "\n";
-  o << "------------------------------------------------\n";
+  o << DISPLAY_LINE << "\n";
   o << getDescription() << "\n";
   if(m_objectCount > 0){
     o << "\n";
@@ -852,7 +868,7 @@ void Room::display(std::ostream& o) const{
   o << "\n";
   displayExits(o);
   o << "\n";
-  o << "------------------------------------------------";
+  o << DISPLAY_LINE;
 }
 
 //------------------------------------------------------
@@ -873,7 +889,7 @@ bool Room::activate(int action, int state, int direction, Object* target, int ex
 
     case VISIBLE_SET:
       setVisible(state);
-      true;
+      return true;
 
     default:
       return Container::activate(action, state, direction, target, extra);
@@ -889,12 +905,12 @@ std::ostream& operator<<(std::ostream& o, Room& room){
   }
   else{
     o << "\n";
-    o << "------------------------------------------------\n";
+    o << DISPLAY_LINE << "\n";
     o << "You are in some kind of room.\n";
     o << "\n";
     o << "The room is dark.\n";
     o << "You cannot see whether there are any exits.\n";
-    o << "------------------------------------------------";
+    o << DISPLAY_LINE;
   }
 
   return o;

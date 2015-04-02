@@ -33,14 +33,23 @@ CorridorRoom::CorridorRoom(int initialDirection, bool isVisible, bool* whichExit
 
   if(whichExits == NULL){
     m_whichExits = new bool[m_maxExits];
-    for(int i=0; i<m_maxExits; i++)
+    for(int i=0; i<m_maxExits; i++){
       m_whichExits[i] = false;
+    }
   }
   else{
     m_whichExits = whichExits;
   }
 
   m_exits = new RoomExit*[m_maxExits];
+  for(int i=0; i<getMaxExits(); i++){
+    if(exitExists(getRoomExitDirection(i))){
+      m_exits[i] = new RoomExit();
+    }
+    else{
+      m_exits[i] = NULL;
+    }
+  }
 
   m_title = "corridor";
   m_descriptor = "a";

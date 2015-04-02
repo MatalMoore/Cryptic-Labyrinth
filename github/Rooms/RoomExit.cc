@@ -107,6 +107,10 @@ RoomExit::~RoomExit(){
 //------------------------------------------------------
 void RoomExit::setBlocked(bool boolean){
   m_isBlocked = boolean;
+
+  if(!boolean){
+    setHidden(false);
+  }
 }
 //------------------------------------------------------
 // #setHidden
@@ -200,7 +204,7 @@ int RoomExit::getRoom2Direction(){
 //------------------------------------------------------
 void RoomExit::display(std::ostream& o) const{
   o << "\n";
-  o << "------------------------------------------------\n";
+  o << DISPLAY_LINE << "\n";
   o << getName() << "\n";
   o << "\n";
   o << "Room1: ";
@@ -232,7 +236,7 @@ void RoomExit::display(std::ostream& o) const{
   else{
     o << "no\n";
   }
-  o << "------------------------------------------------";
+  o << DISPLAY_LINE;
 }
 
 //------------------------------------------------------
@@ -253,16 +257,19 @@ bool RoomExit::activate(int action, int state, int direction, Object* target, in
   switch(action){
     case BLOCK_SET:
       if(currentRoomFlag){
-        if(state && !isBlocked()){
-          cout << "The "
-            << exitDirectionString
-            << " exit slides open."
-            << endl;
+        if(isBlocked() == state){
+          return true;
         }
-        else if(!state && isBlocked()){
+        else if(state){
           cout << "The "
             << exitDirectionString
             << " exit slides shut."
+            << endl;
+        }
+        else{
+          cout << "The "
+            << exitDirectionString
+            << " exit slides open."
             << endl;
         }
       }

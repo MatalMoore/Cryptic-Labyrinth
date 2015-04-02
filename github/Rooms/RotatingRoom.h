@@ -16,7 +16,7 @@ class RotatingRoom: public RoundRoom{
 
     virtual void setExit(const int whichDirection, RoomExit* roomExit);
 
-    virtual void linkRooms(const int whichDirection, Room* room=NULL, const int toWhichDirection=OPPOSITE, RoomExit* roomExit=NULL);
+    virtual void linkRooms(const int whichDirection, Room* room=NULL, RoomExit* roomExit=NULL, const int toWhichDirection=OPPOSITE);
 
     Room* getAxisRoom() const;
     bool isDirectionOnAxis(const int whichDirection) const;

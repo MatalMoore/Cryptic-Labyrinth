@@ -9,7 +9,7 @@ const bool SHOW_MESSAGES = false;
 
 const int ARGC_MAX = 20;
 
-// actiavte action constants
+// activate action constants
 // -!- MUST BE EXCLUSIVE -!-
 
 const int DEFAULT_ACTION = -1;
@@ -36,8 +36,8 @@ const int OBTAIN_SET = 11;
 const int OBTAINABLE_TOGGLE = 12;
 const int OBTAIN_TOGGLE = 13;
 
-const int ON_ACTION_SET = 14;
-const int OFF_ACTION_SET = 15;
+const int ON_ACTION_ADD = 14;
+const int OFF_ACTION_ADD = 15;
 const int SWITCH_PRESS = 16;
 
 const int VISIBLE_SET = 17;
@@ -95,6 +95,9 @@ const std::string CHARACTER = "CHARACTER";
 const std::string FLOOR = "floor";
 const std::string WALL = "wall";
 const std::string CEILING = "ceiling";
+
+const std::string DISPLAY_LINE = "------------------------------------------------------------";
+const std::string DISPLAY_LINE_ALT = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
 // arrays that are used for quick access to strings
 // -!- NEED TO HAVE INDICES CORRESPONDING TO (DIRECTION - NO_DIRECTION) -!-

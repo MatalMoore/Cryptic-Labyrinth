@@ -9,112 +9,116 @@
 using namespace std;
 
 int main(){
+  const int roomCount = 9;
+  const int roomExitCount = 11;
+  const int switchCount = 2;
+
+  int i;
+
   bool exitFlag = false;
 
   string input;
 
+  Room* winRoom = NULL;
+
+  Room* rooms[roomCount];
+
+  RoomExit* roomExits[roomExitCount];
+
+  Switch* switches[switchCount];
+
+#if 0
   cout << endl;
   cout << "Initializing ..." << endl;
   cout << endl;
+#endif
 
-  cout << "Room* myRoom = new RoundRoom;" << endl;
-  Room* myRoom = new RoundRoom;
+  rooms[0] = new RotatingRoom;
+  for(i=0; i<6; i++){
+    rooms[i+1] = new Room;
+  }
+  for(i=0; i<2; i++){
+    rooms[7+i] = new RoundRoom;
+  }
 
-  cout << "Room* room1 = new Room;" << endl;
-  Room* room1 = new Room;
+  for(i=0; i<roomExitCount; i++){
+    roomExits[i] = new RoomExit;
+  }
 
-  cout << "Room* room2 = new RoundRoom;" << endl;
-  Room* room2 = new RoundRoom;
+  for(i=0; i<switchCount; i++){
+    switches[i] = new Switch;
+  }
 
-  cout << "myRoom->linkRooms(N, room2);" << endl;
-  myRoom->linkRooms(N, room2);
+#if 0
+  for(i=0; i<roomCount; i++){
+    cout << rooms[i]->getName() << " -" << rooms[i]->getRoomType() << "-" << endl;
+  }
+#endif
 
-  cout << "room2->linkRooms(W, room1);" << endl;
-  room2->linkRooms(W, room1);
+  roomExits[4]->setBlocked(true);
+  roomExits[4]->setHidden(true);
 
-  cout << "myRoom->linkRooms(W, new RoundRoom);" << endl;
-  myRoom->linkRooms(W, new RoundRoom);
+  rooms[0]->linkRooms(N, 1, 0);
+  rooms[0]->linkRooms(E, 3, 3);
+  rooms[0]->linkRooms(S, 4, 6);
+  rooms[0]->linkRooms(W, 6, 9);
 
-  cout << "myRoom->getRoom(W)->linkRooms(N, room1);" << endl;
-  myRoom->getRoom(W)->linkRooms(N, room1);
+  rooms[2]->linkRooms(W, 1, 1);
+  rooms[2]->linkRooms(S, 3, 2);
 
-  cout << "myRoom->linkRooms(S, new CorridorRoom(S));" << endl;
-  myRoom->linkRooms(S, new CorridorRoom(S));
+  rooms[5]->linkRooms(N, 6, 8);
+  rooms[5]->linkRooms(E, 4, 7);
 
-  cout << "myRoom->linkRooms(NE, new RotatingRoom(NE));" << endl;
-  myRoom->linkRooms(NE, new RotatingRoom(NE));
+  rooms[7]->linkRooms(N, 3, 4);
+  rooms[7]->linkRooms(NW, 0, 5);
 
-  cout << "myRoom->getRoom(N)->setVisible(false);" << endl;
-  myRoom->getRoom(N)->setVisible(false);
+  rooms[8]->linkRooms(SE, 0, 10);
 
-  cout << "myRoom->linkRooms(E, new RoundRoom);" << endl;
-  myRoom->linkRooms(E, new RoundRoom);
+  switches[0] = new Switch(true);
+  switches[1] = new Switch;
 
-  cout << "myRoom->setExitBlocked(NE, false);" << endl;
-  myRoom->setExitBlocked(NE, false);
+  switches[0]->addOnAction(ROTATE_SET, 0, SE, rooms[0]);
+  switches[0]->addOffAction(ROTATE_SET, 0, N, rooms[0]);
 
-  cout << "myRoom->linkRooms(SE, new DiagonalRoom);" << endl;
-  myRoom->linkRooms(SE, new DiagonalRoom);
+  switches[1]->addOnAction(BLOCK_SET, false, 0, roomExits[4]);
 
-  cout << "myRoom->linkRooms(NW, new DiagonalRoom);" << endl;
-  myRoom->linkRooms(NW, new DiagonalRoom);
+  rooms[3]->addObject(switches[0], E, WALL);
+  rooms[6]->addObject(switches[1], W, WALL);
 
-  cout << "myRoom->linkRooms(SW, new DiagonalRoom);" << endl;
-  myRoom->linkRooms(SW, new DiagonalRoom);
-
-  cout << "myRoom->setExitBlocked(SE, true);" << endl;
-  myRoom->setExitBlocked(SE, true);
-
-  cout << "myRoom->setExitBlocked(SW, true);" << endl;
-  myRoom->setExitBlocked(SW, true);
-
-  cout << "myRoom->getRoom(NE)->linkRooms(E, new Room);" << endl;
-  myRoom->getRoom(NE)->linkRooms(E, new Room);
-
-  myRoom->getRoom(S)->linkRooms(S, new RoundRoom);
-
-  cout << "Item* myItem = new Switch(true);" << endl;
-  Item* myItem = new Switch(false);
-
-  myItem->activate(ON_ACTION_SET, 0, 0, myRoom->getExit(SW), BLOCK_TOGGLE);
-
-  cout << "myRoom->addObject(myItem, CENTER, FLOOR);" << endl;
-  myRoom->addObject(myItem, CENTER, FLOOR);
-
-  cout << "Item* myItem2 = new Switch;" << endl;
-  Item* myItem2 = new Switch;
-
-  cout << "myItem2->activate(ON_ACTION_SET, 0, 0, myRoom->getExit(SE), BLOCK_TOGGLE);" << endl;
-  myItem2->activate(ON_ACTION_SET, 0, 0, myRoom->getExit(SE), BLOCK_TOGGLE);
-
-  cout << "myRoom->getRoom(SW)->addObject(myItem2, S, WALL);" << endl;
-  myRoom->getRoom(SW)->addObject(myItem2, S, WALL);
-
-  cout << "Item* myItem3 = new Switch(true);" << endl;
-  Item* myItem3 = new Switch(true);
-
-  cout << "myItem3->activate(ON_ACTION_SET, 0, E, myRoom->getRoom(NE), ROTATE_SET);" << endl;
-  myItem3->activate(ON_ACTION_SET, 0, E, myRoom->getRoom(NE), ROTATE_SET);
-
-  cout << "myItem3->activate(OFF_ACTION_SET, 0, NE, myRoom->getRoom(NE), ROTATE_SET);" << endl;
-  myItem3->activate(OFF_ACTION_SET, 0, NE, myRoom->getRoom(NE), ROTATE_SET);
-
-  cout << "myRoom->addObject(myItem3, NNW, WALL);" << endl;
-  myRoom->addObject(myItem3, NNW, WALL);
-
+#if 0
   cout << endl;
   cout << "Initialized" << endl;
+#endif
+
+  cout << endl;
+  cout << "You may type \"help\" to see the available commands." << endl;
   cout << endl;
 
-  Character::PLAYER->setCurrentRoom(myRoom);
+  Character::PLAYER->setCurrentRoom(rooms[0]);
   Character::PLAYER->displayCurrentRoom();
 
+  winRoom = rooms[8];
+  winRoom->setDescription("You leave the dungeon.");
+
   while(!exitFlag){
-    cout << endl
-      << "Input command: ";
+    cout << endl;
+
+    if(Character::PLAYER->getCurrentRoom() == winRoom){
+      cout << "You win!" << endl;
+      break;
+    }
+
+#if 0
+    cout << Character::PLAYER->getCurrentRoom()->getName() << endl;
+    cout << endl;
+#endif
+
+    cout << DISPLAY_LINE_ALT << endl;
+    cout << "Input command: ";
     getline(cin, input);
     cout << endl;
-    //cout << "Parsing \"" << input << "\" ..." << endl;
+    cout << DISPLAY_LINE_ALT << endl;
+    cout << endl;
     exitFlag = parse(input);
   }
 

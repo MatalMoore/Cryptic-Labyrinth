@@ -30,7 +30,11 @@ class Room: public Container{
     // 'OPPOSITE' indicates the opposite direction of
     //  'whichDirection'
     //------------------------------------------------------
-    virtual void linkRooms(const int whichDirection, Room* room=NULL, const int toWhichDirection=OPPOSITE, RoomExit* roomExit=NULL);
+    virtual void linkRooms(const int whichDirection, Room* room=NULL, RoomExit* roomExit=NULL, const int toWhichDirection=OPPOSITE);
+
+    void linkRooms(const int whichDirection, const int roomID, RoomExit* roomExit=NULL, const int toWhichDirection=OPPOSITE);
+
+    void linkRooms(const int whichDirection, const int roomID, const int roomExitID, const int toWhichDirection=OPPOSITE);
 
     void unlinkRooms(const int whichDirection, const bool isExitDeleted = true);
 

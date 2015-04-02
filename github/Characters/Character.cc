@@ -23,7 +23,6 @@ Character::Character(Room* initialRoom, int initialPosition, int initialFacing){
     s_characterMax = 100;
     s_characters = new Character*[s_characterMax];
     if(SHOW_MESSAGES){
-      cout << "-!- " << SHOW_MESSAGES << " -!-" << endl;
       cerr << "s_characters: Allocated" << endl
         << endl;
     }

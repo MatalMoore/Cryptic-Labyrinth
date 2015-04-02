@@ -17,7 +17,7 @@ const std::string helpEXIT = "Exits the program";
 const std::string helpHELP = "Displays help information";
 const std::string helpLOOK = "Looks around at the current ROOM";
 const std::string helpGO = "Attempts to GO to the ROOM in the given DIRECTION";
-const std::string helpUSE = "Attempts to USE the OBJECT with the given TITLE";
+const std::string helpUSE = "Attempts to USE the given OBJECT";
 
 const std::string argsHELP = "[COMMAND]";
 const std::string argsGO = "DIRECTION";

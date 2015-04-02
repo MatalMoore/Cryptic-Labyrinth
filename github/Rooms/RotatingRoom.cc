@@ -87,8 +87,8 @@ void RotatingRoom::setExit(int whichDirection, RoomExit* roomExit){
 //------------------------------------------------------
 // #linkRooms()
 //------------------------------------------------------
-void RotatingRoom::linkRooms(int whichDirection, Room* room, int toWhichDirection, RoomExit* roomExit){
-  RoundRoom::linkRooms(whichDirection, room, toWhichDirection, roomExit);
+void RotatingRoom::linkRooms(int whichDirection, Room* room, RoomExit* roomExit, int toWhichDirection){
+  RoundRoom::linkRooms(whichDirection, room, roomExit, toWhichDirection);
   if(isDirectionOnAxis(whichDirection)){
     m_axisRoom->setExit(whichDirection, getExit(whichDirection));
   }
@@ -298,7 +298,7 @@ void RotatingRoom::display(std::ostream& o) const{
 
   if(m_areOtherExitsVisible){
     o << "\n";
-    o << "------------------------------------------------\n";
+    o << DISPLAY_LINE << "\n";
     o << getDescription() << "\n";
     o << "The axis runs "
       << compassDirectionToString(minDirection)
@@ -322,11 +322,11 @@ void RotatingRoom::display(std::ostream& o) const{
       displayExits(o);
     }
     o << "\n";
-    o << "------------------------------------------------";
+    o << DISPLAY_LINE;
   }
   else{
     o << "\n";
-    o << "------------------------------------------------\n";
+    o << DISPLAY_LINE << "\n";
     o << m_axisRoom->getDescription() << "\n";
     o << "\n";
     if(m_objectCount > 0){
@@ -335,7 +335,7 @@ void RotatingRoom::display(std::ostream& o) const{
     }
     m_axisRoom->displayExits(o);
     o << "\n";
-    o << "------------------------------------------------";
+    o << DISPLAY_LINE;
   }
 }
 
